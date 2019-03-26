@@ -24,15 +24,22 @@ protected:
   long millis_last;
 
 public:
-  Filter() {millis_last = millis();}
+  Filter() { millis_last = millis(); }
 
-  enum{
+  enum
+  {
     SPIKE_TOP,
     SPIKE_BOT
   };
 
-  Filter& initAccel(Type start_value, double factor){accel_last = start_value; accel_factor = factor;return *this;}
-  Filter& updateAccel(Type new_val){
+  Filter &initAccel(Type start_value, double factor)
+  {
+    accel_last = start_value;
+    accel_factor = factor;
+    return *this;
+  }
+  Filter &updateAccel(Type new_val)
+  {
     double time_diff = millis() - millis_last;
     time_diff /= 1000;
     millis_last = millis();
@@ -44,17 +51,20 @@ public:
 
     return *this;
   }
-  Type getAccel(){return accel_last;}
+  Type getAccel() { return accel_last; }
 
-  Filter& initLinear(Type start_value, double transition_time){
+  Filter &initLinear(Type start_value, double transition_time)
+  {
     linear_last = start_value;
     linear_target = start_value;
     linear_transition_time = transition_time;
     return *this;
   }
-  Filter& limitLinear(Type lower, Type upper){
+  Filter &limitLinear(Type lower, Type upper)
+  {
     linear_limit = true;
-    if(upper < lower){//change
+    if (upper < lower)
+    { //change
       Type tmp = lower;
       lower = upper;
       upper = tmp;
@@ -63,24 +73,33 @@ public:
     linear_lower_lim = lower;
   }
 
-  Filter& updateLinear(Type new_val){
+  Filter &updateLinear(Type new_val)
+  {
     double delta_t = millis() - millis_last;
-    if(new_val != linear_target){
-      linear_target = new_val;
-      linear_step = linear_target - linear_last;
-    }
-    Type lin_single_step = (linear_step * delta_t) / linear_transition_time;
 
-    linear_last = linearIncrement(linear_target, linear_last, lin_single_step);
+    if (linear_transition_time > 0)
+    {
+      if (new_val != linear_target)
+      {
+        linear_target = new_val;
+        linear_step = linear_target - linear_last;
+      }
+      Type lin_single_step = (linear_step * delta_t) / linear_transition_time;
+
+      linear_last = linearIncrement(linear_target, linear_last, lin_single_step);
+    }
+    else
+    {
+      linear_last = new_val;
+    }
 
     millis_last = millis();
     return *this;
   }
-  Type getLinear(){return linear_last;}
+  Type getLinear() { return linear_last; }
 
-
-
-  Filter& initSpike(Type init, double max_step, int spike = SPIKE_BOT){
+  Filter &initSpike(Type init, double max_step, int spike = SPIKE_BOT)
+  {
     spike_last = init;
     spike_use = init;
     spike_max_step = max_step;
@@ -88,40 +107,57 @@ public:
     spike_wrong = false;
     return *this;
   }
-  Type spike(Type val){
+  Type spike(Type val)
+  {
     Type diff = val - spike_last;
     spike_last = val;
-    if(diff > spike_max_step){
-      spike_wrong = (spike_type == SPIKE_BOT)? true: false;
+    if (diff > spike_max_step)
+    {
+      spike_wrong = (spike_type == SPIKE_BOT) ? true : false;
     }
-    else if(diff < -spike_max_step){
-      spike_wrong = (spike_type == SPIKE_TOP)? true: false;
+    else if (diff < -spike_max_step)
+    {
+      spike_wrong = (spike_type == SPIKE_TOP) ? true : false;
     }
-    if(!spike_wrong){
+    if (!spike_wrong)
+    {
       spike_use = spike_last;
     }
     return spike_use;
   }
 
-  Type fixOverflow(Type x){
-    if(linear_limit && x < linear_lower_lim)x = linear_lower_lim;
-    if(linear_limit && x > linear_upper_lim)x = linear_upper_lim;
+  Type fixOverflow(Type x)
+  {
+    if (linear_limit && x < linear_lower_lim)
+      x = linear_lower_lim;
+    if (linear_limit && x > linear_upper_lim)
+      x = linear_upper_lim;
     return x;
   }
 
-  Type linearIncrement(Type target, Type value, Type step){
+  Type linearIncrement(Type target, Type value, Type step)
+  {
     Type ret;
-    if( abs_(target - value) < abs_(step) ){
+    if (abs_(target - value) < abs_(step))
+    {
       ret = target;
     }
-    else{
+    else
+    {
       ret = fixOverflow(value + step);
     }
     return ret;
   }
 
-  static Type map(Type x, Type in_min, Type in_max, Type out_min, Type out_max){return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;}
-  static Type abs_(Type x){if(x < 0){return -x;}return x;}
+  static Type map(Type x, Type in_min, Type in_max, Type out_min, Type out_max) { return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min; }
+  static Type abs_(Type x)
+  {
+    if (x < 0)
+    {
+      return -x;
+    }
+    return x;
+  }
 };
 
 #endif // FILTER_H
