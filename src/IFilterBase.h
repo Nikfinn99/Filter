@@ -27,6 +27,13 @@ class IFilterBase
         return *this;
     }
 
+    IFilterBase &setStartValue(float start)
+    {
+        m_last = start;
+        m_target = start;
+        return *this;
+    }
+
     IFilterBase &setLimit(float upper, float lower)
     {
         m_limit = true;
