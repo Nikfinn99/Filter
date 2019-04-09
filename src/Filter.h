@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 
+#error "This Version of Filter is depreceated"
+
 template <typename Type = double>
 class Filter
 {
