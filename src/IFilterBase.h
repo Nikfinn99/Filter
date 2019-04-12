@@ -16,7 +16,16 @@ class IFilterBase
     float m_limit_lower;
 
   public:
-    IFilterBase() : m_millis_last(millis()) {}
+    IFilterBase()
+        : IFilterBase(0, 0) {}
+
+    // same as init but in constructor
+    IFilterBase(float target, float time_parameter)
+        : m_millis_last(millis()),
+          m_last(target),
+          m_target(target),
+          m_time_parameter(time_parameter) {}
+
     ~IFilterBase() {}
 
     IFilterBase &init(float start, float time_parameter)

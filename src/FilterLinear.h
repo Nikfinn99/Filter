@@ -9,6 +9,11 @@ private:
 
 public:
   FilterLinear() {}
+
+  // same as init but in constructor
+  FilterLinear(float target, float time_parameter)
+      : IFilterBase(target, time_parameter) {}
+
   ~FilterLinear() {}
 
   virtual void setTarget(float p_target) override

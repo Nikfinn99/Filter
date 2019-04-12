@@ -7,6 +7,11 @@ class FilterAccel : public IFilterBase
   private:
   public:
     FilterAccel() {}
+
+    // same as init but in constructor
+    FilterAccel(float target, float time_parameter)
+        : IFilterBase(target, time_parameter) {}
+
     ~FilterAccel() {}
 
     virtual void setTarget(float p_target) override
