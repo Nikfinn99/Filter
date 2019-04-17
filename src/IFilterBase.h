@@ -57,6 +57,11 @@ class IFilterBase
         return *this;
     }
 
+    float getTimeParameter()
+    {
+        return m_time_parameter;
+    }
+
     float getValue()
     {
         if (m_limit) // limit enabled
