@@ -1,11 +1,15 @@
 #pragma once
 
+#ifdef ARDUINO
 #include <Arduino.h>
+#else
+#include <chrono>
+#endif
 
 class IFilterBase
 {
   protected:
-    unsigned long m_millis_last;
+    uint64_t m_millis_last;
 
     float m_last;
     float m_target;
@@ -15,13 +19,41 @@ class IFilterBase
     float m_limit_upper;
     float m_limit_lower;
 
+    static uint64_t getTime()
+    {
+#ifdef ARDUINO
+        return millis();
+#else
+        auto now = std::chrono::steady_clock::now();
+        auto duration = now.time_since_epoch();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+#endif
+    }
+
+    uint64_t getDeltaTime()
+    {
+        uint64_t millis = getTime();
+        uint64_t delta = millis - m_millis_last;
+        m_millis_last = millis;
+        return delta;
+    }
+
+    float abs(float a)
+    {
+        if (a < 0)
+        {
+            return -a;
+        }
+        return a;
+    }
+
   public:
     IFilterBase()
         : IFilterBase(0, 0) {}
 
     // same as init but in constructor
     IFilterBase(float target, float time_parameter)
-        : m_millis_last(millis()),
+        : m_millis_last(getTime()),
           m_last(target),
           m_target(target),
           m_time_parameter(time_parameter) {}
