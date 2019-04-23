@@ -38,6 +38,7 @@ class IFilterBase
         return delta;
     }
 
+#ifndef ARDUINO
     float abs(float a)
     {
         if (a < 0)
@@ -46,6 +47,7 @@ class IFilterBase
         }
         return a;
     }
+#endif
 
   public:
     IFilterBase()
