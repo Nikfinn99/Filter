@@ -21,14 +21,28 @@ class FilterAccel : public IFilterBase
 
     virtual void update() override
     {
-        float time_diff = millis() - m_millis_last;
-        time_diff /= 1000;
-        m_millis_last = millis();
+        float delta_t = getDeltaTime();
 
-        float factor = (1 / m_time_parameter) * time_diff;
+        float factor;
         if (m_time_parameter == 0) // division by zero so apply change instantly
+        {
             factor = 1;
-        factor = constrain(factor, 0, 1);
+        }
+        else
+        {
+            factor = (1 / m_time_parameter) * delta_t;
+        }
+
+        // constrain
+        if (factor < 0)
+        {
+            factor = 0;
+        }
+
+        if (factor > 1)
+        {
+            factor = 1;
+        }
 
         m_last = m_last * (1 - factor) + m_target * factor;
     }
